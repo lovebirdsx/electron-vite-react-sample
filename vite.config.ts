@@ -67,5 +67,11 @@ export default defineConfig(({ command }) => {
     ],
     server: getServerOptions(),
     clearScreen: false,
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './src/setupTests.ts', 
+      css: true,
+    },
   }
 });
