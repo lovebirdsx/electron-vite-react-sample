@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { storage } from '../../base/storage';
@@ -29,7 +29,46 @@ function saveWindowState(section: string, window: BrowserWindow) {
     });
 }
 
+async function runCliTest() {
+    console.log('run cli test');
+}
+
+const menuTemplate: MenuItemConstructorOptions[] = [
+    {
+        label: 'Edit',
+        submenu: [
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut' },
+            { role: 'copy' },
+            { role: 'paste' },
+            { role: 'delete' },
+            { type: 'separator' },
+            { role: 'selectAll' }
+        ]
+    },
+    {
+        label: 'Window',
+        submenu: [
+            { role: 'minimize' },
+            { role: 'zoom' },
+            { role: 'close' }
+        ]
+    },
+    {
+        label: 'Test',
+        submenu: [
+            { label: 'Log', click: () => { console.log('test log') } },
+            { label: 'Run Cli', click: runCliTest },
+        ]
+    },
+];
+
 async function createWindow() {
+    const menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
+
     const state = storage.read('mainWindow', 'config', defalutWindowConfig);
 
     const win = new BrowserWindow({
@@ -40,7 +79,7 @@ async function createWindow() {
             preload: join(__dirname, './preload.mjs'),
         },
     });
-    
+
     if (process.env.VITE_DEV_SERVER_URL) {
         win.loadURL(process.env.VITE_DEV_SERVER_URL);
     } else {
@@ -50,7 +89,7 @@ async function createWindow() {
     if (state.showDevTools) {
         win.webContents.openDevTools();
     }
-    
+
     app.on('second-instance', () => {
         if (win.isMinimized()) {
             win.restore();
