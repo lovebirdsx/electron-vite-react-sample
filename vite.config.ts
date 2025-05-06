@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import electron from 'vite-plugin-electron/simple';
@@ -20,8 +19,6 @@ function getServerOptions() {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  rmSync('dist-electron', { recursive: true, force: true })
-
   const isServe = command === 'serve'
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
@@ -37,10 +34,10 @@ export default defineConfig(({ command }) => {
       react(),
       electron({
         main: {
-          entry: resolve(__dirname, 'electron/main.ts'),
+          entry: resolve(__dirname, 'src/vsplay/electron-main/main.ts'),
           onstart(args) {
             if (process.env.VSCODE_DEBUG) {
-              console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
+              console.log('[startup] Electron App')
             } else {
               args.startup()
             }
@@ -56,7 +53,7 @@ export default defineConfig(({ command }) => {
           },
         },
         preload: {
-          input: resolve(__dirname, 'electron/preload.ts'),
+          input: resolve(__dirname, 'src/vsplay/electron-main/preload.ts'),
           vite: {
             build: {
               sourcemap: sourcemap ? 'inline' : undefined, // #332
