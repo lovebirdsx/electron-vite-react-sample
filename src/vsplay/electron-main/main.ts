@@ -6,15 +6,9 @@ import { storage } from '../../base/storage';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-process.env.DIST = join(__dirname, '../dist');
-process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-    ? join(process.env.DIST, '../public')
-    : process.env.DIST;
-
-let win: BrowserWindow | null;
-const preload = join(__dirname, './preload.mjs');
-const url = process.env.VITE_DEV_SERVER_URL!;
-const indexHtml = join(process.env.DIST, 'index.html');
+// main打包后路径为：dist/out/vsplay/electron-main/main.js，在vite.config.ts中配置
+const DIST = join(__dirname, '../../..');
+const VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? join(DIST, '../public') : DIST;
 
 const defalutWindowConfig = {
     x: 0,
@@ -38,39 +32,47 @@ function saveWindowState(section: string, window: BrowserWindow) {
 async function createWindow() {
     const state = storage.read('mainWindow', 'config', defalutWindowConfig);
 
-    win = new BrowserWindow({
+    const win = new BrowserWindow({
         title: 'Main window',
-        icon: join(process.env.VITE_PUBLIC!, 'vite.svg'),
+        icon: join(VITE_PUBLIC, 'vite.svg'),
         ...state,
         webPreferences: {
-            preload,
+            preload: join(__dirname, './preload.mjs'),
         },
     });
-
+    
     if (process.env.VITE_DEV_SERVER_URL) {
-        win.loadURL(url);
-        if (state.showDevTools) {
-            win.webContents.openDevTools();
-        }
+        win.loadURL(process.env.VITE_DEV_SERVER_URL);
     } else {
-        win.loadFile(indexHtml);
+        win.loadFile(join(DIST, 'index.html'));
     }
 
+    if (state.showDevTools) {
+        win.webContents.openDevTools();
+    }
+    
+    app.on('second-instance', () => {
+        if (win.isMinimized()) {
+            win.restore();
+        }
+        win.focus();
+    });
+
     win.on('close', () => {
-        saveWindowState('mainWindow', win!);
+        saveWindowState('mainWindow', win);
     });
 
     win.on('resize', () => {
-        saveWindowState('mainWindow', win!);
+        saveWindowState('mainWindow', win);
     });
 
     win.on('move', () => {
-        saveWindowState('mainWindow', win!);
+        saveWindowState('mainWindow', win);
     });
 
     win.once('ready-to-show', () => {
-        win?.show();
-        win?.focus();
+        win.show();
+        win.focus();
     });
 
     win.webContents.on('did-finish-load', () => {
@@ -86,27 +88,20 @@ async function createWindow() {
     });
 }
 
-app.whenReady().then(createWindow);
+function main() {
+    app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-    win = null;
-    if (process.platform !== 'darwin') app.quit();
-});
-
-app.on('second-instance', () => {
-    if (win) {
-        if (win.isMinimized()) {
-            win.restore();
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
         }
-        win.focus();
-    }
-})
+    });
 
-app.on('activate', () => {
-    const allWindows = BrowserWindow.getAllWindows()
-    if (allWindows.length) {
-        allWindows[0].focus();
-    } else {
-        createWindow();
-    }
-})
+    app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin') {
+            app.quit();
+        }
+    });
+}
+
+main();

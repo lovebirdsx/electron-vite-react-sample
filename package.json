@@ -3,7 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist-electron/main.js",
+  "main": "dist/out/vsplay/electron-main/main.js",
+  "description": "Test Vite",
+  "author": {
+    "name": "lovebird",
+    "email": "lovebirdsx@gmail.com"
+  },
   "scripts": {
     "dev": "vite",
     "prebuild": "npm run clean",
@@ -24,7 +29,7 @@
     "files": [
       "dist/assets/**/*",
       "dist/index.html",
-      "dist-electron/**/*",
+      "dist/out/**/*",
       "package.json"
     ],
     "asar": true,

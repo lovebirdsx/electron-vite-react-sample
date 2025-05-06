@@ -45,7 +45,7 @@ export default defineConfig(({ command }) => {
           vite: {
             build: {
               sourcemap,
-              outDir: resolve(__dirname, 'dist-electron'),
+              outDir: resolve(__dirname, 'dist/out/vsplay/electron-main'),
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },
@@ -58,7 +58,7 @@ export default defineConfig(({ command }) => {
             build: {
               sourcemap: sourcemap ? 'inline' : undefined, // #332
               minify: isBuild,
-              outDir: resolve(__dirname, 'dist-electron'),
+              outDir: resolve(__dirname, 'dist/out/vsplay/electron-main'),
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },
