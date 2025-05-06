@@ -24,7 +24,7 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
   return {
-    root: resolve(__dirname, 'src'),
+    root: resolve(__dirname, 'src/workbench'),
     build: {
       outDir: resolve(__dirname, 'dist'),
       sourcemap,
