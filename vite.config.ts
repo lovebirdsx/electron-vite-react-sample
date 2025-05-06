@@ -7,21 +7,21 @@ import pkg from './package.json';
 
 function getServerOptions() {
   if (!process.env.VSCODE_DEBUG) {
-    return undefined
+    return undefined;
   }
 
-  const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
+  const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL);
   return {
     host: url.hostname,
     port: +url.port,
-  }
+  };
 }
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  const isServe = command === 'serve'
-  const isBuild = command === 'build'
-  const sourcemap = isServe || !!process.env.VSCODE_DEBUG
+  const isServe = command === 'serve';
+  const isBuild = command === 'build';
+  const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
 
   return {
     root: resolve(__dirname, 'src/workbench'),
@@ -37,9 +37,9 @@ export default defineConfig(({ command }) => {
           entry: resolve(__dirname, 'src/vsplay/electron-main/main.ts'),
           onstart(args) {
             if (process.env.VSCODE_DEBUG) {
-              console.log('[startup] Electron App')
+              console.log('[startup] Electron App');
             } else {
-              args.startup()
+              args.startup();
             }
           },
           vite: {
@@ -49,7 +49,7 @@ export default defineConfig(({ command }) => {
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },
-            }
+            },
           },
         },
         preload: {
@@ -67,15 +67,15 @@ export default defineConfig(({ command }) => {
         },
         renderer: {},
       }),
-      renderer()
+      renderer(),
     ],
     server: getServerOptions(),
     clearScreen: false,
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: resolve(__dirname, './src/setupTests.ts'), 
+      setupFiles: resolve(__dirname, './src/setupTests.ts'),
       css: true,
     },
-  }
+  };
 });
