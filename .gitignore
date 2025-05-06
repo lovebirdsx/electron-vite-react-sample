@@ -1,3 +1,4 @@
 .vscode/.debug.env
 node_modules
 dist-electron
+dist
