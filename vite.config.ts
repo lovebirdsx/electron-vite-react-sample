@@ -1,9 +1,10 @@
-import { defineConfig } from 'vite'
-import { rmSync } from 'node:fs'
-import react from '@vitejs/plugin-react'
-import electron from 'vite-plugin-electron/simple'
-import renderer from 'vite-plugin-electron-renderer'
-import pkg from './package.json'
+import { defineConfig } from 'vite';
+import { rmSync } from 'node:fs';
+import { resolve } from 'node:path';
+import react from '@vitejs/plugin-react';
+import electron from 'vite-plugin-electron/simple';
+import renderer from 'vite-plugin-electron-renderer';
+import pkg from './package.json';
 
 function getServerOptions() {
   if (!process.env.VSCODE_DEBUG) {
@@ -26,11 +27,17 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
   return {
+    root: resolve(__dirname, 'src'),
+    build: {
+      outDir: resolve(__dirname, 'dist'),
+      sourcemap,
+      emptyOutDir: true,
+    },
     plugins: [
       react(),
       electron({
         main: {
-          entry: 'electron/main.ts',
+          entry: resolve(__dirname, 'electron/main.ts'),
           onstart(args) {
             if (process.env.VSCODE_DEBUG) {
               console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
@@ -41,7 +48,7 @@ export default defineConfig(({ command }) => {
           vite: {
             build: {
               sourcemap,
-              outDir: 'dist-electron',
+              outDir: resolve(__dirname, 'dist-electron'),
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },
@@ -49,12 +56,12 @@ export default defineConfig(({ command }) => {
           },
         },
         preload: {
-          input: 'electron/preload.ts',
+          input: resolve(__dirname, 'electron/preload.ts'),
           vite: {
             build: {
               sourcemap: sourcemap ? 'inline' : undefined, // #332
               minify: isBuild,
-              outDir: 'dist-electron',
+              outDir: resolve(__dirname, 'dist-electron'),
               rollupOptions: {
                 external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
               },
@@ -70,7 +77,7 @@ export default defineConfig(({ command }) => {
     test: {
       globals: true,
       environment: 'jsdom',
-      setupFiles: './src/setupTests.ts', 
+      setupFiles: resolve(__dirname, './src/setupTests.ts'), 
       css: true,
     },
   }
