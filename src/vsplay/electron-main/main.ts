@@ -1,7 +1,8 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { storage } from '../../base/storage';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,6 +58,13 @@ const menuTemplate: MenuItemConstructorOptions[] = [
         ]
     },
     {
+        label: 'Tools',
+        submenu: [
+            { label: 'Reload', click: () => { BrowserWindow.getFocusedWindow()?.webContents.reload() } },
+            { label: 'Toggle DevTools', click: () => { BrowserWindow.getFocusedWindow()?.webContents.toggleDevTools() } },
+        ]
+    },
+    {
         label: 'Test',
         submenu: [
             { label: 'Log', click: () => { console.log('test log') } },
@@ -65,12 +73,25 @@ const menuTemplate: MenuItemConstructorOptions[] = [
     },
 ];
 
-async function createWindow() {
+async function installReactDevTools() {
+    if (process.env.NODE_ENV === 'development') {
+        try {
+            const result = await installExtension(REACT_DEVELOPER_TOOLS);
+            console.log(`Added Extension:  ${result.name}`);
+            return true;
+        } catch (e) {
+            console.error('An error occurred: ', e);
+        }
+    }
+
+    return false;
+}
+
+async function createWindow(autoRefresh = false) {
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
 
     const state = storage.read('mainWindow', 'config', defalutWindowConfig);
-
     const win = new BrowserWindow({
         title: 'Main window',
         icon: join(VITE_PUBLIC, 'vite.svg'),
@@ -112,6 +133,12 @@ async function createWindow() {
     win.once('ready-to-show', () => {
         win.show();
         win.focus();
+
+        if (autoRefresh) {
+            setTimeout(() => {
+                win.webContents.reload();
+            }, 500);
+        }
     });
 
     win.webContents.on('did-finish-load', () => {
@@ -128,7 +155,11 @@ async function createWindow() {
 }
 
 function main() {
-    app.whenReady().then(createWindow);
+    app.on('ready', async () => {
+        // electron的bug，安装react-devtools后，并不会马上生效，需要手动刷新一下页面
+        const installSucceed = await installReactDevTools();
+        createWindow(installSucceed);
+    });
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {

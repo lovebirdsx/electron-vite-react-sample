@@ -39,7 +39,9 @@ export default defineConfig(({ command }) => {
             if (process.env.VSCODE_DEBUG) {
               console.log('[startup] Electron App');
             } else {
-              args.startup();
+              // react-devtools要生效，必须加上下面的参数
+              // 参考：https://github.com/electron-vite/electron-vite-react/issues/207#issuecomment-2312073305
+              args.startup(['.']);
             }
           },
           vite: {
@@ -47,7 +49,7 @@ export default defineConfig(({ command }) => {
               sourcemap,
               outDir: resolve(__dirname, 'dist/out/vsplay/electron-main'),
               rollupOptions: {
-                external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                external: [...Object.keys(pkg.dependencies)],
               },
             },
           },
