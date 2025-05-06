@@ -1,4 +1,6 @@
 {
+  // 下面的设定是为了解决test无法调试的问题，参考<https://github.com/vitest-dev/vscode/issues/548#issuecomment-2749211666>
+  "vitest.shellType": "terminal",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
