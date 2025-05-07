@@ -69,6 +69,9 @@ export default defineConfig(({ command }) => {
         },
         {
           entry: resolve(__dirname, 'src/vsplay/node/cli.ts'),
+          // 空的onstart函数是为了避免在开发模式下启动electron主进程
+          onstart() {
+          },
           vite: {
             build: {
               sourcemap,
