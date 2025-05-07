@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
-import electron from 'vite-plugin-electron/simple';
+import electron from 'vite-plugin-electron';
 import renderer from 'vite-plugin-electron-renderer';
 import pkg from './package.json';
 
@@ -32,8 +32,8 @@ export default defineConfig(({ command }) => {
     },
     plugins: [
       react(),
-      electron({
-        main: {
+      electron([
+        {
           entry: resolve(__dirname, 'src/vsplay/electron-main/main.ts'),
           onstart(args) {
             if (process.env.VSCODE_DEBUG) {
@@ -54,8 +54,8 @@ export default defineConfig(({ command }) => {
             },
           },
         },
-        preload: {
-          input: resolve(__dirname, 'src/vsplay/electron-main/preload.ts'),
+        {
+          entry: resolve(__dirname, 'src/vsplay/electron-main/preload.ts'),
           vite: {
             build: {
               sourcemap: sourcemap ? 'inline' : undefined, // #332
@@ -67,8 +67,16 @@ export default defineConfig(({ command }) => {
             },
           },
         },
-        renderer: {},
-      }),
+        {
+          entry: resolve(__dirname, 'src/vsplay/node/cli.ts'),
+          vite: {
+            build: {
+              sourcemap,
+              outDir: resolve(__dirname, 'dist/out/vsplay/node'),
+            },
+          },
+        }
+      ]),
       renderer(),
     ],
     server: getServerOptions(),

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell, utilityProcess } from 'electron';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { storage } from '../../base/storage';
@@ -31,7 +31,14 @@ function saveWindowState(section: string, window: BrowserWindow) {
 }
 
 async function runCliTest() {
-    console.log('run cli test');
+    const cliPath = join(DIST, 'out/vsplay/node/cli.js');
+    const process = utilityProcess.fork(cliPath);
+    process.on('error', (err) => {
+        console.error('Failed to start child process.', err);
+    });
+    process.on('exit', (code) => {
+        console.log(`Child process exited with code ${code}`);
+    });
 }
 
 const menuTemplate: MenuItemConstructorOptions[] = [
@@ -97,7 +104,7 @@ async function createWindow(autoRefresh = false) {
         icon: join(VITE_PUBLIC, 'vite.svg'),
         ...state,
         webPreferences: {
-            preload: join(__dirname, './preload.mjs'),
+            preload: join(DIST, 'out/vsplay/electron-main/preload.mjs'),
         },
     });
 
