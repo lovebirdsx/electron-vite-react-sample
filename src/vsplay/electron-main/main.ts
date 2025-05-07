@@ -137,7 +137,7 @@ async function createWindow(autoRefresh = false) {
         if (autoRefresh) {
             setTimeout(() => {
                 win.webContents.reload();
-            }, 500);
+            }, 1000);
         }
     });
 
