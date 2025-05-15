@@ -52,6 +52,7 @@
       "request": "attach",
       "type": "chrome",
       "timeout": 60000,
+      "webRoot": "${workspaceFolder}/src/workbench",
       "skipFiles": [
         "<node_internals>/**",
         "${workspaceRoot}/node_modules/**",
