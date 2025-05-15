@@ -6,6 +6,7 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const isDev = process.env.NODE_ENV === 'development';
 
 // main打包后路径为：dist/out/vsplay/electron-main/main.js，在vite.config.ts中配置
 const DIST = join(__dirname, '../../..');
@@ -105,6 +106,7 @@ async function createWindow(autoRefresh = false) {
         ...state,
         webPreferences: {
             preload: join(DIST, 'out/vsplay/electron-main/preload.js'),
+            nodeIntegration: isDev,
         },
     });
 
