@@ -36,19 +36,19 @@
       },
       "runtimeArgs": [
         "--no-sandbox",
-        "--remote-debugging-port=9229",
+        "--remote-debugging-port=9129",
         "."
       ],
       "env": {
         "VSCODE_DEBUG": "true",
         "NODE_ENV": "development",
-        "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+        "VITE_DEV_SERVER_URL": "http://127.0.0.1:7877/"
       },
       "console": "integratedTerminal"
     },
     {
       "name": "Debug Renderer Process",
-      "port": 9229,
+      "port": 9129,
       "request": "attach",
       "type": "chrome",
       "timeout": 60000,
@@ -57,7 +57,7 @@
         "${workspaceRoot}/node_modules/**",
         "${workspaceRoot}/dist-electron/**",
         // Skip files in host(VITE_DEV_SERVER_URL)
-        "http://127.0.0.1:7777/**"
+        "http://127.0.0.1:7877/**"
       ]
     },
   ]

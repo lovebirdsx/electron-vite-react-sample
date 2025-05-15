@@ -104,7 +104,7 @@ async function createWindow(autoRefresh = false) {
         icon: join(VITE_PUBLIC, 'vite.svg'),
         ...state,
         webPreferences: {
-            preload: join(DIST, 'out/vsplay/electron-main/preload.mjs'),
+            preload: join(DIST, 'out/vsplay/electron-main/preload.js'),
         },
     });
 
