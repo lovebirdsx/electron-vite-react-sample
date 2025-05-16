@@ -106,7 +106,10 @@ async function createWindow(autoRefresh = false) {
         ...state,
         webPreferences: {
             preload: join(DIST, 'out/vsplay/electron-main/preload.js'),
+
+            // 开发模式下，sandbox设置为false，nodeIntegration设置为true，是为了方便调试preload.ts
             nodeIntegration: isDev,
+            sandbox: !isDev,
         },
     });
 
